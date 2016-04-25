@@ -1,0 +1,56 @@
+{
+  "uuid": "9739bb74-f2a1-4da4-a134-1cc6b43ca18a",
+  "shortName": "BigCounter",
+  "longName": "BigCounter",
+  "companyName": "aocodermx",
+  "versionLabel": "1.0",
+  "sdkVersion": "3",
+  "targetPlatforms": ["aplite"],
+  "watchapp": {
+    "watchface": false
+  },
+  "appKeys": {
+    "dummy": 0
+  },
+  "resources": {
+    "media": [
+      {
+        "type": "png",
+        "name": "MENU_ICON",
+        "file": "_menu_icon.png",
+        "menuIcon": true
+      },
+
+      {
+        "type": "png",
+        "name": "ICON_ACTION_U1",
+        "file": "icon_action_U1.png"
+      },
+      {
+        "type": "png",
+        "name": "ICON_ACTION_U2",
+        "file": "icon_action_U2.png"
+      },
+      {
+        "type": "png",
+        "name": "ICON_ACTION_M1",
+        "file": "icon_action_M1.png"
+      },
+      {
+        "type": "png",
+        "name": "ICON_ACTION_M2",
+        "file": "icon_action_M2.png"
+      },
+      {
+        "type": "png",
+        "name": "ICON_ACTION_D1",
+        "file": "icon_action_D1.png"
+      },
+      {
+        "type": "png",
+        "name": "ICON_ACTION_D2",
+        "file": "icon_action_D2.png"
+      }
+    ]
+  }
+}
