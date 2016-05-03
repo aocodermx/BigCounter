@@ -28,8 +28,8 @@ int get_stroke_width ( int no_digits ) {
     case 4:
       return 20;
     case 5:
-      return 10;
-    default:
       return 15;
+    default:
+      return 20;
   }
 }

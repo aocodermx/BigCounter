@@ -6,8 +6,10 @@
 void draw_decimal_to_base ( GContext * ctx, GRect bounds, int decimal, int dst_base, DigitCallback draw_digit_callback ) {
   int digits_no = get_digits_for ( decimal, dst_base );
   int * result  = malloc         ( digits_no * sizeof ( int ) );
-  int digitHeight = bounds.size.h;
-  int digitWitdh  = bounds.size.w / digits_no;
+  int no_cols = ( digits_no > MAX_NUMBERS_PER_LINE ) ? ( digits_no + MAX_NUMBERS_PER_LINE - 1 ) / MAX_NUMBERS_PER_LINE : 1;
+  int no_rows = ( digits_no > MAX_NUMBERS_PER_LINE ) ? MAX_NUMBERS_PER_LINE : digits_no;
+  int digitWitdh  = bounds.size.w / no_rows;
+  int digitHeight = bounds.size.h / no_cols;
 
   if ( decimal == 0 ) {
     draw_digit_callback ( ctx, GRect ( 0, 0, digitWitdh, digitHeight ), 0, 1 );
@@ -15,17 +17,27 @@ void draw_decimal_to_base ( GContext * ctx, GRect bounds, int decimal, int dst_b
   }
 
   // Convert decimal in dst base
-  for ( int position = 0; decimal != 0; position++ ) {
-    result [position] = decimal % dst_base;
+  for ( int i = 0; decimal != 0; i++ ) {
+    result [i] = decimal % dst_base;
     // fprintf ( stdout, "> %d %% %d = %d \n", decimal, dst_base, decimal % dst_base );
+    // APP_LOG ( APP_LOG_LEVEL_INFO, "> %d %% %d = %d", decimal, dst_base, decimal % dst_base );
     decimal /= dst_base;
   }
 
+  // APP_LOG ( APP_LOG_LEVEL_INFO, "ditigs_no: %d, no_cols: %d, no_rows:%d, digitWitdh: %d, digitHeight: %d", digits_no, no_cols, no_rows, digitWitdh, digitHeight );
+
   // fprintf ( stdout, "Number in base %d is: ", dst_base );
-  for ( int position = digits_no - 1, i = 0; position >= 0; position--, i++ ) {
-    // fprintf ( stdout, "%d,", result [position] );
-    // CALLBACK TO FUNCTION DRAW_DIGIT with result [position]
-    draw_digit_callback ( ctx, GRect ( i * digitWitdh, 0, digitWitdh, digitHeight ), result[position], digits_no );
+  int index = digits_no - 1;
+  for ( int y = 0; y < no_cols; y++ ) {
+    for ( int x = 0; x < no_rows ; x++ ) {
+      // fprintf ( stdout, "%d,", result [index] );
+      // CALLBACK TO FUNCTION DRAW_DIGIT with result [index]
+      // APP_LOG ( APP_LOG_LEVEL_INFO, "( x:%d, y:%d, w:%d, h:%d ): %d", x * digitWitdh, y * digitHeight, digitWitdh, digitHeight, index );
+      draw_digit_callback ( ctx, GRect ( x * digitWitdh, y * digitHeight, digitWitdh, digitHeight ), result[index], no_rows );
+      index--;
+      if ( index < 0)
+        break;
+    }
   }
 
   free ( result );
