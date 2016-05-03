@@ -1,9 +1,12 @@
 #include <pebble.h>
 #include "BigCounter.h"
+#include "SystemSelector.h"
 
 #include "nsystems/nsystems.h"
+#include "../utils.h"
 
 static int s_count;
+static int s_base;
 static int s_version;
 static int s_tap_enabled;
 static Window         *window;
@@ -22,7 +25,6 @@ static void window_unload      ( Window * );
 static void window_appear      ( Window * );
 static void window_disappear   ( Window * );
 static void update_count_layer ( Layer *, GContext * );
-static int  get_digits_no      ( int, int );
 
 static void U1_click_handler  ( ClickRecognizerRef, void * );
 static void U2_click_handler  ( ClickRecognizerRef, void * );
@@ -31,7 +33,6 @@ static void M2_click_handler  ( ClickRecognizerRef, void * );
 static void D1_click_handler  ( ClickRecognizerRef, void * );
 static void D2_click_handler  ( ClickRecognizerRef, void * );
 static void tap_handler       ( AccelAxisType, int32_t );
-static int  myPow             ( int, int );
 
 static void click_config_provider_principal ( void * );
 static void click_config_provider_secondary ( void * );
@@ -40,6 +41,7 @@ static void set_click_config_provider_secondary ( void * );
 
 
 static void window_load ( Window *window ) {
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Loading window_big_counter" );
   Layer *window_layer = window_get_root_layer ( window );
   GRect bounds = layer_get_bounds ( window_layer );
 
@@ -54,6 +56,9 @@ static void window_load ( Window *window ) {
 
   set_click_config_provider_principal ( NULL );
 
+  s_base = persist_exists ( KEY_PERSIST_NSYSTEM ) ? persist_read_int ( KEY_PERSIST_NSYSTEM ) : 10;
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Base: %d", s_base );
+
   s_count_layer = layer_create ( GRect ( 0, 0, bounds.size.w - ACTION_BAR_WIDTH, bounds.size.h ) );
   layer_set_update_proc ( s_count_layer, update_count_layer );
 
@@ -61,6 +66,7 @@ static void window_load ( Window *window ) {
 }
 
 static void window_unload ( Window *window ) {
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Unloading window_big_counter" );
   layer_destroy      ( s_count_layer    );
   gbitmap_destroy    ( s_icon_action_U1 );
   gbitmap_destroy    ( s_icon_action_U2 );
@@ -72,6 +78,10 @@ static void window_unload ( Window *window ) {
 }
 
 static void window_appear    ( Window *window ) {
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Appear window_big_counter" );
+  s_base = persist_exists ( KEY_PERSIST_NSYSTEM ) ? persist_read_int ( KEY_PERSIST_NSYSTEM ) : 10;
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Base Returned: %d", s_base );
+
   s_version     = persist_exists ( KEY_PERSIST_VERSION     ) ? persist_read_int ( KEY_PERSIST_VERSION     ) : 1;
   s_count       = persist_exists ( KEY_PERSIST_COUNT       ) ? persist_read_int ( KEY_PERSIST_COUNT       ) : 0;
   s_tap_enabled = persist_exists ( KEY_PERSIST_TAP_ENABLED ) ? persist_read_int ( KEY_PERSIST_TAP_ENABLED ) : 0;
@@ -80,6 +90,8 @@ static void window_appear    ( Window *window ) {
 }
 
 static void window_disappear ( Window *window ) {
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Disappear window_big_counter" );
+  accel_tap_service_unsubscribe ( );
   persist_write_int ( KEY_PERSIST_COUNT      , s_count       );
   persist_write_int ( KEY_PERSIST_TAP_ENABLED, s_tap_enabled );
   if ( !persist_exists ( KEY_PERSIST_VERSION ) ) {
@@ -90,30 +102,13 @@ static void window_disappear ( Window *window ) {
 
 static void update_count_layer ( Layer *layer, GContext *ctx ) {
   GRect bounds = layer_get_bounds ( s_count_layer );
-  int digits = get_digits_no ( s_count, 10 );
-  int digitWitdh = bounds.size.w / digits;
-  int digitHeight = bounds.size.h;
-  int tmp_count = s_count;
 
   graphics_context_set_stroke_color ( ctx, GColorBlack );
   graphics_context_set_fill_color   ( ctx, GColorWhite );
 
-  // APP_LOG ( APP_LOG_LEVEL_INFO, "Update count layer: %d, digits: %d", s_count, digits );
+  // draw_number_decimal ( ctx, bounds, s_count );
 
-  for ( int a = 0; a < digits; a++) {
-    int digit = tmp_count / myPow ( 10, digits - a - 1 );
-    draw_digit_decimal ( ctx, GRect ( a * digitWitdh, 0, digitWitdh, digitHeight ), digit, digits );
-    tmp_count -= digit * myPow ( 10, digits - a - 1 );
-  }
-}
-
-static int get_digits_no ( int number, int base ) {
-  int position = 0;
-  if ( number == 0 ) return 1;
-  while ( number / myPow ( base, position ) != 0  ) {
-    position ++;
-  }
-  return position;
+  draw_decimal_to_base ( ctx, bounds, s_count, s_base, draw_base_callback );
 }
 
 static void U1_click_handler ( ClickRecognizerRef recognizer, void *context ) {
@@ -127,7 +122,8 @@ static void M1_click_handler ( ClickRecognizerRef recognizer, void *context ) {
 }
 
 static void D1_click_handler ( ClickRecognizerRef recognizer, void *context ) {
-  s_count--;
+  if ( s_count != 0)
+    s_count--;
   layer_mark_dirty ( s_count_layer );
 }
 
@@ -138,7 +134,7 @@ static void U2_click_handler ( ClickRecognizerRef recognizer, void *context ) {
 }
 
 static void M2_click_handler ( ClickRecognizerRef recognizer, void *context ) {
-  // Call Settings Window
+  window_systemselector_init ( );
 }
 
 static void D2_click_handler ( ClickRecognizerRef recognizer, void *context ) {
@@ -168,15 +164,6 @@ static void tap_handler ( AccelAxisType axis, int32_t direction ) {
   }
   */
   layer_mark_dirty ( s_count_layer );
-}
-
-static int myPow ( int base, int power ) {
-  if ( power == 0 ) return 1;
-  int result = base;
-  for ( int i = 1; i<power; i++ ) {
-    result *= base;
-  }
-  return result;
 }
 
 static void click_config_provider_principal ( void *context ) {
@@ -220,6 +207,7 @@ static void set_click_config_provider_secondary ( void *data ) {
 
 
 void window_bigcounter_init ( void ) {
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Init window_big_counter" );
   window = window_create ( );
   //window_set_click_config_provider ( window, click_config_provider );
   window_set_window_handlers ( window, ( WindowHandlers ) {
@@ -233,5 +221,6 @@ void window_bigcounter_init ( void ) {
 }
 
 void window_bigcounter_deinit ( void ) {
+  APP_LOG ( APP_LOG_LEVEL_INFO, "Deinit window_big_counter" );
   window_destroy ( window );
 }
