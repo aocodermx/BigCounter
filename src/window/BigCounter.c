@@ -128,7 +128,7 @@ static void D1_click_handler ( ClickRecognizerRef recognizer, void *context ) {
 }
 
 static void U2_click_handler ( ClickRecognizerRef recognizer, void *context ) {
-  app_timer_reschedule ( s_action_bar_timer, TIME_ACTION_BAR );
+  app_timer_reschedule ( s_action_bar_timer, 10 );
   s_count = 0;
   layer_mark_dirty ( s_count_layer );
 }
@@ -138,7 +138,7 @@ static void M2_click_handler ( ClickRecognizerRef recognizer, void *context ) {
 }
 
 static void D2_click_handler ( ClickRecognizerRef recognizer, void *context ) {
-  app_timer_reschedule ( s_action_bar_timer, TIME_ACTION_BAR );
+  app_timer_reschedule ( s_action_bar_timer, 10 );
   s_tap_enabled ^= 1;
 
   if ( s_tap_enabled )

@@ -5,50 +5,35 @@
 
 void draw_decimal_to_base ( GContext * ctx, GRect bounds, int decimal, int dst_base, DigitCallback draw_digit_callback ) {
   int digits_no = get_digits_for ( decimal, dst_base );
-  int * result  = malloc         ( digits_no * sizeof ( int ) );
   int no_cols = ( digits_no > MAX_NUMBERS_PER_LINE ) ? ( digits_no + MAX_NUMBERS_PER_LINE - 1 ) / MAX_NUMBERS_PER_LINE : 1;
   int no_rows = ( digits_no > MAX_NUMBERS_PER_LINE ) ? MAX_NUMBERS_PER_LINE : digits_no;
   int digitWitdh  = bounds.size.w / no_rows;
   int digitHeight = bounds.size.h / no_cols;
 
   if ( decimal == 0 ) {
-    draw_digit_callback ( ctx, GRect ( 0, 0, digitWitdh, digitHeight ), 0, 1 );
+    graphics_context_set_stroke_width ( ctx, ( get_stroke_width ( 1 ) * digitWitdh ) / 100 );
+    draw_digit_callback ( ctx, GRect ( 0, 0, digitWitdh, digitHeight ), 0 );
     return;
   }
 
-  // Convert decimal in dst base
-  for ( int i = 0; decimal != 0; i++ ) {
-    result [i] = decimal % dst_base;
-    // fprintf ( stdout, "> %d %% %d = %d \n", decimal, dst_base, decimal % dst_base );
-    // APP_LOG ( APP_LOG_LEVEL_INFO, "> %d %% %d = %d", decimal, dst_base, decimal % dst_base );
-    decimal /= dst_base;
-  }
+  graphics_context_set_stroke_width ( ctx, ( get_stroke_width ( no_rows ) * digitWitdh ) / 100 );
 
   // APP_LOG ( APP_LOG_LEVEL_INFO, "ditigs_no: %d, no_cols: %d, no_rows:%d, digitWitdh: %d, digitHeight: %d", digits_no, no_cols, no_rows, digitWitdh, digitHeight );
-
-  // fprintf ( stdout, "Number in base %d is: ", dst_base );
-  int index = digits_no - 1;
-  for ( int y = 0; y < no_cols; y++ ) {
-    for ( int x = 0; x < no_rows ; x++ ) {
-      // fprintf ( stdout, "%d,", result [index] );
-      // CALLBACK TO FUNCTION DRAW_DIGIT with result [index]
-      // APP_LOG ( APP_LOG_LEVEL_INFO, "( x:%d, y:%d, w:%d, h:%d ): %d", x * digitWitdh, y * digitHeight, digitWitdh, digitHeight, index );
-      draw_digit_callback ( ctx, GRect ( x * digitWitdh, y * digitHeight, digitWitdh, digitHeight ), result[index], no_rows );
-      index--;
-      if ( index < 0)
+  for ( int y = no_cols - 1, index = 0; y >= 0; y-- ) {
+    for ( int x = no_rows -1; x >= 0; x--, index++ ) {
+      // APP_LOG ( APP_LOG_LEVEL_INFO, "[%d]( x:%d, y:%d, w:%d, h:%d ): %d", index, x * digitWitdh, y * digitHeight, digitWitdh, digitHeight, decimal % dst_base );
+      draw_digit_callback ( ctx, GRect ( x * digitWitdh, y * digitHeight, digitWitdh, digitHeight ), decimal % dst_base );
+      decimal /= dst_base;
+      if ( index >= digits_no - 1 )
         break;
     }
   }
-
-  free ( result );
 }
 
 
 
-void draw_base_callback ( GContext * ctx, GRect box, int digit, int no_digits ) {
+void draw_base_callback ( GContext * ctx, GRect box, int digit ) {
   GPoint p1, p2;
-
-  graphics_context_set_stroke_width ( ctx, ( get_stroke_width ( no_digits ) * box.size.w ) / 100 );
 
   switch ( digit ) {
     case 0:

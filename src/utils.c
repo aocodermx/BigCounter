@@ -20,15 +20,15 @@ int get_digits_for ( int decimal, int dst_base ) {
 int get_stroke_width ( int no_digits ) {
   switch ( no_digits ) {
     case 1:
-      return 10;
-    case 2:
       return 20;
+    case 2:
+      return 30;
     case 3:
       return 30;
     case 4:
-      return 20;
+      return 30;
     case 5:
-      return 15;
+      return 30;
     default:
       return 20;
   }
