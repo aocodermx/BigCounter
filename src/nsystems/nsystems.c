@@ -3,7 +3,10 @@
 #include "../utils.h"
 
 
-void draw_decimal_to_base ( GContext * ctx, GRect bounds, int decimal, int dst_base, DigitCallback draw_digit_callback ) {
+int draw_decimal_to_base ( GContext * ctx, GRect bounds, int decimal, int dst_base, DigitCallback draw_digit_callback ) {
+  if ( myPow ( dst_base, MAX_ROWS * MAX_NUMBERS_PER_LINE ) == decimal && decimal != 0 )
+    dst_base ++;
+
   int digits_no = get_digits_for ( decimal, dst_base );
   int no_cols = ( digits_no > MAX_NUMBERS_PER_LINE ) ? ( digits_no + MAX_NUMBERS_PER_LINE - 1 ) / MAX_NUMBERS_PER_LINE : 1;
   int no_rows = ( digits_no > MAX_NUMBERS_PER_LINE ) ? MAX_NUMBERS_PER_LINE : digits_no;
@@ -13,7 +16,7 @@ void draw_decimal_to_base ( GContext * ctx, GRect bounds, int decimal, int dst_b
   if ( decimal == 0 ) {
     graphics_context_set_stroke_width ( ctx, ( get_stroke_width ( 1 ) * digitWitdh ) / 100 );
     draw_digit_callback ( ctx, GRect ( 0, 0, digitWitdh, digitHeight ), 0 );
-    return;
+    return dst_base;
   }
 
   graphics_context_set_stroke_width ( ctx, ( get_stroke_width ( no_rows ) * digitWitdh ) / 100 );
@@ -28,6 +31,7 @@ void draw_decimal_to_base ( GContext * ctx, GRect bounds, int decimal, int dst_b
         break;
     }
   }
+  return dst_base;
 }
 
 

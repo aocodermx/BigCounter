@@ -1,10 +1,11 @@
 #pragma once
 
-#define MAX_NUMBERS_PER_LINE 5
+#define MAX_NUMBERS_PER_LINE  6
+#define MAX_ROWS              6
 
 typedef void ( * DigitCallback ) ( GContext *, GRect, int );
 
-void draw_decimal_to_base ( GContext *, GRect, int, int, DigitCallback );
+int draw_decimal_to_base ( GContext *, GRect, int, int, DigitCallback );
 
 void draw_base_callback    ( GContext *, GRect, int ); // Any base from 1 - 16
 void draw_binary_callback  ( GContext *, GRect, int ); // Base 2

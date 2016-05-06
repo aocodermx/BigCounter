@@ -18,7 +18,6 @@ static void item_selected_handler ( int, void * );
 
 
 static void window_load ( Window * window ) {
-  APP_LOG ( APP_LOG_LEVEL_INFO, "Loading window_system_selector" );
   Layer *window_layer = window_get_root_layer ( window );
   GRect bounds = layer_get_bounds ( window_layer );
 
@@ -124,23 +123,19 @@ static void window_load ( Window * window ) {
 
 }
 static void window_unload ( Window * window ) {
-  APP_LOG ( APP_LOG_LEVEL_INFO, "Unloading window_system_selector" );
   simple_menu_layer_destroy ( s_systems_menu );
 }
 
 static void window_appear ( Window * window ) {
-  APP_LOG ( APP_LOG_LEVEL_INFO, "Appear window_system_selector" );
   s_nsystem = persist_exists ( KEY_PERSIST_NSYSTEM ) ? persist_read_int ( KEY_PERSIST_NSYSTEM ) : 10;
   simple_menu_layer_set_selected_index ( s_systems_menu, s_nsystem - 2, true );
 }
 
 static void window_disappear ( Window * window ) {
-  APP_LOG ( APP_LOG_LEVEL_INFO, "Disappear window_system_selector" );
   persist_write_int ( KEY_PERSIST_NSYSTEM, s_nsystem );
 }
 
 static void item_selected_handler ( int index, void * context ) {
-  APP_LOG ( APP_LOG_LEVEL_INFO, "Item selected %d, base %d", index, index + 2 );
   s_nsystem = index + 2;
   window_stack_remove ( window_system_selector, true );
 }
@@ -149,7 +144,6 @@ static void item_selected_handler ( int index, void * context ) {
 
 
 void window_systemselector_init ( void ) {
-  APP_LOG ( APP_LOG_LEVEL_INFO, "Init window_system_selector" );
   window_system_selector = window_create ( );
   window_set_window_handlers ( window_system_selector, ( WindowHandlers ) {
     .load      = window_load     ,
@@ -162,6 +156,5 @@ void window_systemselector_init ( void ) {
 }
 
 void window_systemselector_deinit ( void ) {
-  APP_LOG ( APP_LOG_LEVEL_INFO, "Deinit window_system_selector" );
   window_destroy ( window_system_selector );
 }
