@@ -21,6 +21,10 @@ static void window_load ( Window * window ) {
   Layer *window_layer = window_get_root_layer ( window );
   GRect bounds = layer_get_bounds ( window_layer );
 
+  #ifdef PBL_COLOR
+    window_set_background_color ( window, GColorPictonBlue );
+  #endif
+
   s_systems [ 0 ] = ( SimpleMenuItem ) {
     .title = "Base 2",
     .subtitle = " - Binary",
@@ -118,6 +122,13 @@ static void window_load ( Window * window ) {
   };
 
   s_systems_menu = simple_menu_layer_create ( bounds, window, s_systems_sections , 1, NULL );
+
+  #ifdef PBL_COLOR
+    MenuLayer *mlayer = simple_menu_layer_get_menu_layer ( s_systems_menu );
+    menu_layer_set_normal_colors ( mlayer, GColorPictonBlue, GColorBlack );
+    menu_layer_set_highlight_colors ( mlayer, GColorOxfordBlue, GColorWhite );
+  #endif
+
 
   layer_add_child ( window_layer, simple_menu_layer_get_layer ( s_systems_menu ) );
 

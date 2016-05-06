@@ -64,6 +64,11 @@ static void window_load ( Window *window ) {
   s_bottom_layer = text_layer_create ( GRect ( 0, bounds.size.h - BOTTOM_BAR_HEIGHT, bounds.size.w - ACTION_BAR_WIDTH, BOTTOM_BAR_HEIGHT ) );
   text_layer_set_text_alignment ( s_bottom_layer, GTextAlignmentCenter );
 
+  #ifdef PBL_COLOR
+    window_set_background_color ( window, GColorPictonBlue );
+    text_layer_set_background_color ( s_bottom_layer, GColorPictonBlue );
+  #endif
+
   layer_add_child ( window_layer, s_count_layer );
   layer_add_child ( window_layer, text_layer_get_layer ( s_bottom_layer ) );
 }
@@ -108,7 +113,7 @@ static void update_count_layer ( Layer *layer, GContext *ctx ) {
   GRect bounds = layer_get_bounds ( s_count_layer );
 
   graphics_context_set_stroke_color ( ctx, GColorBlack );
-  graphics_context_set_fill_color   ( ctx, GColorWhite );
+  // graphics_context_set_fill_color   ( ctx, GColorWhite );
 
   // draw_number_decimal ( ctx, bounds, s_count );
 
