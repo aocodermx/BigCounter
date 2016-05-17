@@ -4,7 +4,8 @@
   "longName": "BigCounter",
   "companyName": "aocodermx",
   "versionLabel": "1.0",
-  "sdkVersion": "3",
+  "versionCode": 1,
+  "sdkVersion": "2",
   "targetPlatforms": ["aplite", "basalt"],
   "watchapp": {
     "watchface": false
@@ -24,32 +25,32 @@
       {
         "type": "png",
         "name": "ICON_ACTION_U1",
-        "file": "icon_action_U1.png"
+        "file": "icon_action_U1_for2x.png"
       },
       {
         "type": "png",
         "name": "ICON_ACTION_U2",
-        "file": "icon_action_U2.png"
+        "file": "icon_action_U2_for2x.png"
       },
       {
         "type": "png",
         "name": "ICON_ACTION_M1",
-        "file": "icon_action_M1.png"
+        "file": "icon_action_M1_for2x.png"
       },
       {
         "type": "png",
         "name": "ICON_ACTION_M2",
-        "file": "icon_action_M2.png"
+        "file": "icon_action_M2_for2x.png"
       },
       {
         "type": "png",
         "name": "ICON_ACTION_D1",
-        "file": "icon_action_D1.png"
+        "file": "icon_action_D1_for2x.png"
       },
       {
         "type": "png",
         "name": "ICON_ACTION_D2",
-        "file": "icon_action_D2.png"
+        "file": "icon_action_D2_for2x.png"
       }
     ]
   }

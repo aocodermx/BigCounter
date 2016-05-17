@@ -237,6 +237,7 @@ void window_bigcounter_init ( void ) {
     .disappear = window_disappear,
   } );
 
+  window_set_fullscreen ( window, true );
   window_stack_push ( window, true );
 }
 
